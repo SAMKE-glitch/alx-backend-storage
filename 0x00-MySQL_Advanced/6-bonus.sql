@@ -5,14 +5,20 @@
 -- project_name, a new or already exists projects - if no projects.name found in the table, you should create it 
 -- score, the score value for the correction
 -- Context: Write code in SQL is anice level up!
-
-DELIMITER $$;
-CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT )
+DELIMITER //
+CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT)
 BEGIN
-	IF NOT EXISTS(SELECT name FROM projects WHERE name=project_name) THEN
+	DECLARE project_id INT;
+
+	-- check if the project exists, and create if not
+	SELECT id INTO project_id FROM projects WHERE name = project_name;
+	IF project_id IS NULL THEN
 		INSERT INTO projects (name) VALUES (project_name);
+		SET project_id = LAST_INSERT_ID();
 	END IF;
-	INSERT INTO corrections (user_id, project_id, score)
-	VALUES (user_id, (SELECT id from projects WHERE name=project_name) score);
-END;$$
+
+	-- Add the bonus correction
+	INSERT INTO correction (user_id, project_id, score) VALUES (user_id, project_id, score);
+END;
+//
 DELIMITER ;
