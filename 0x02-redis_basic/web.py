@@ -40,13 +40,14 @@ def url_access_count(method):
         r.incr(key_count)
         r.set(key, html_content, ex=10)
         r.expire(key, 10)
-        return wrapper
+        return html_content
+    return wrapper
+        
+@url_access_count
+def get_page(url: str) -> str:
+    """obtain the HTML content of a particular"""
+    results = requests.get(url)
+    return results.text
 
-    @url_access_count
-    def get_page(url: str) -> str:
-        """obtain the HTML content of a particular"""
-        results = requests.get(url)
-        return results.text
-
-    if __name__ == "__main__":
-        get_page('http://slowwly.robertomurray.co.uk')
+if __name__ == "__main__":
+    get_page('http://slowwly.robertomurray.co.uk')
